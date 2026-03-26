@@ -1,0 +1,26 @@
+# ─── Segredos e Licenças ───────────────────────────────────
+*.dat
+generator.js
+
+# ─── Dependências ──────────────────────────────────────────
+node_modules/
+
+# ─── Build / Distribuição ──────────────────────────────────
+dist/
+out/
+build/
+
+# ─── Logs ──────────────────────────────────────────────────
+*.log
+npm-debug.log*
+
+# ─── Sistema Operacional ───────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Editores ──────────────────────────────────────────────
+.vscode/
+.idea/
+*.suo
+*.user

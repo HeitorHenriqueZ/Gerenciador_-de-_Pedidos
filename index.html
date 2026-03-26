@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Pedidos</title>
+
+  <!--
+    ╔══════════════════════════════════════════════════════╗
+    ║  SISTEMA DE PEDIDOS  —  Electron Edition             ║
+    ║                                                      ║
+    ║  index.html  →  estrutura HTML (white label)         ║
+    ║  css/style.css  →  estilização                       ║
+    ║  js/license.js  →  overlay de licença (carrega 1º)  ║
+    ║  js/script.js   →  lógica do app                    ║
+    ╚══════════════════════════════════════════════════════╝
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+
+  <link rel="stylesheet" href="./css/style.css" />
+
+  <!-- Estilos do overlay de licença (inlined para carregar antes do CSS do app) -->
+  <style>
+    /* ── Overlay de bloqueio ── */
+    #license-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      background: linear-gradient(135deg, #1a0a2e 0%, #16213e 50%, #0f3460 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Nunito', sans-serif;
+    }
+    #license-overlay.hidden { display: none; }
+
+    .lic-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 48px 40px;
+      max-width: 460px;
+      width: 90%;
+      text-align: center;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 32px 64px rgba(0,0,0,0.5);
+    }
+    .lic-icon {
+      font-size: 56px;
+      margin-bottom: 16px;
+      display: block;
+    }
+    .lic-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      color: #fff;
+      margin: 0 0 8px;
+    }
+    .lic-sub {
+      color: rgba(255,255,255,0.55);
+      font-size: 14px;
+      margin: 0 0 32px;
+    }
+    .lic-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+      text-align: left;
+      margin-bottom: 6px;
+    }
+    .lic-machine-box {
+      background: rgba(0,0,0,0.35);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 12px 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: #a0e4ff;
+      word-break: break-all;
+      text-align: left;
+      margin-bottom: 8px;
+      user-select: all;
+    }
+    .lic-copy-btn {
+      background: none;
+      border: none;
+      color: rgba(255,255,255,0.4);
+      font-size: 11px;
+      cursor: pointer;
+      padding: 0;
+      margin-bottom: 24px;
+      text-decoration: underline;
+      font-family: 'Nunito', sans-serif;
+    }
+    .lic-copy-btn:hover { color: #fff; }
+    .lic-input {
+      width: 100%;
+      box-sizing: border-box;
+      background: rgba(255,255,255,0.08);
+      border: 1.5px solid rgba(255,255,255,0.18);
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-size: 14px;
+      color: #fff;
+      font-family: 'Courier New', monospace;
+      outline: none;
+      margin-bottom: 8px;
+      transition: border-color .2s;
+    }
+    .lic-input:focus { border-color: #a0e4ff; }
+    .lic-input::placeholder { color: rgba(255,255,255,0.25); font-family: 'Nunito', sans-serif; }
+    .lic-activate-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #e040fb, #7c4dff);
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      letter-spacing: .5px;
+      transition: opacity .2s, transform .1s;
+      margin-top: 4px;
+    }
+    .lic-activate-btn:hover  { opacity: .92; }
+    .lic-activate-btn:active { transform: scale(.98); }
+    .lic-activate-btn:disabled { opacity: .5; cursor: default; }
+    .lic-error {
+      color: #ff6b6b;
+      font-size: 13px;
+      margin-top: 8px;
+      min-height: 18px;
+    }
+    .lic-success {
+      color: #69f0ae;
+      font-size: 13px;
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════════
+     OVERLAY DE LICENÇA
+     Visível até que a ativação seja confirmada.
+     Não interfere no localStorage do app — vive no processo main.
+════════════════════════════════════════════════════════════ -->
+<div id="license-overlay">
+  <div class="lic-card">
+    <span class="lic-icon">🔒</span>
+    <h2 class="lic-title">Ativação necessária</h2>
+    <p class="lic-sub">
+      Este software precisa ser ativado para este computador.<br>
+      Envie o <strong style="color:#a0e4ff">Código da Máquina</strong> abaixo ao suporte.
+    </p>
+
+    <div class="lic-label">Código da Máquina</div>
+    <div class="lic-machine-box" id="lic-machine-id">Carregando…</div>
+    <button class="lic-copy-btn" onclick="copyMachineId()">📋 Copiar código</button>
+
+    <div class="lic-label">Chave de Ativação</div>
+    <input
+      type="text"
+      class="lic-input"
+      id="lic-key-input"
+      placeholder="Cole aqui a chave recebida…"
+      spellcheck="false"
+    />
+    <div class="lic-error" id="lic-error"></div>
+
+    <button class="lic-activate-btn" id="lic-btn" onclick="activateLicense()">
+      Ativar Software
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     APP PRINCIPAL (mesma estrutura original, white label)
+════════════════════════════════════════════════════════════ -->
+<div class="app-wrap">
+
+  <header class="app-header">
+    <div id="hdr-logo" class="header-logo-ph">🏢</div>
+    <div class="header-text">
+      <h1 id="hdr-name">Sua Empresa</h1>
+      <span>Sistema de Pedidos</span>
+    </div>
+  </header>
+
+  <nav class="app-nav">
+    <button class="nav-btn active" data-view="dashboard"   onclick="nav('dashboard')">🏠 Início</button>
+    <button class="nav-btn"        data-view="clients"     onclick="nav('clients')">👥 Clientes</button>
+    <button class="nav-btn"        data-view="products"    onclick="nav('products')">📦 Produtos</button>
+    <button class="nav-btn"        data-view="orders"      onclick="nav('orders')">📋 Pedidos</button>
+    <button class="nav-btn"        data-view="settings"    onclick="nav('settings')">⚙️ Config.</button>
+  </nav>
+
+  <main class="app-main">
+
+    <section class="view active" id="view-dashboard">
+      <div id="dash-content"></div>
+    </section>
+
+    <section class="view" id="view-clients">
+      <div class="pg-head">
+        <div class="pg-title">
+          Clientes
+          <small>Gerenciamento de clientes</small>
+        </div>
+        <button class="btn btn-primary" onclick="openClientModal()">+ Novo Cliente</button>
+      </div>
+      <div class="filters-row">
+        <div class="search-wrap">
+          <input type="text" id="cli-search" placeholder="Buscar nome, telefone, e-mail…" oninput="renderClients()" />
+        </div>
+        <select id="cli-bday" onchange="renderClients()" style="max-width:175px">
+          <option value="">🎂 Filtrar aniversário</option>
+          <option value="1">Janeiro</option>   <option value="2">Fevereiro</option>
+          <option value="3">Março</option>     <option value="4">Abril</option>
+          <option value="5">Maio</option>      <option value="6">Junho</option>
+          <option value="7">Julho</option>     <option value="8">Agosto</option>
+          <option value="9">Setembro</option>  <option value="10">Outubro</option>
+          <option value="11">Novembro</option> <option value="12">Dezembro</option>
+        </select>
+      </div>
+      <div id="cli-list"></div>
+    </section>
+
+    <section class="view" id="view-products">
+      <div class="pg-head">
+        <div class="pg-title">
+          Produtos
+          <small>Catálogo de produtos</small>
+        </div>
+        <button class="btn btn-primary" onclick="openProductModal()">+ Novo Produto</button>
+      </div>
+      <div id="prod-list"></div>
+    </section>
+
+    <section class="view" id="view-orders">
+      <div class="pg-head">
+        <div class="pg-title">
+          Pedidos
+          <small>Todos os pedidos de venda</small>
+        </div>
+        <button class="btn btn-primary" onclick="nav('order-form', { isNew: true })">+ Novo Pedido</button>
+      </div>
+      <div class="filters-row">
+        <div class="search-wrap">
+          <input type="text" id="ord-search" placeholder="Buscar cliente, nº do pedido, telefone…" oninput="renderOrders()" />
+        </div>
+        <select id="ord-camp" onchange="renderOrders()" style="max-width:175px">
+          <option value="">🎯 Campanha</option>
+        </select>
+        <select id="ord-month" onchange="renderOrders()" style="max-width:175px">
+          <option value="">📅 Mês de entrega</option>
+          <option value="1">Janeiro</option>   <option value="2">Fevereiro</option>
+          <option value="3">Março</option>     <option value="4">Abril</option>
+          <option value="5">Maio</option>      <option value="6">Junho</option>
+          <option value="7">Julho</option>     <option value="8">Agosto</option>
+          <option value="9">Setembro</option>  <option value="10">Outubro</option>
+          <option value="11">Novembro</option> <option value="12">Dezembro</option>
+        </select>
+      </div>
+      <div id="ord-list"></div>
+    </section>
+
+    <section class="view" id="view-order-form">
+      <div id="of-content"></div>
+    </section>
+
+    <section class="view" id="view-settings">
+      <div id="set-content"></div>
+    </section>
+
+  </main>
+</div><!-- /app-wrap -->
+
+<!-- Modal global -->
+<div class="modal-ov" id="modal-ov" onclick="closeModalOv(event)">
+  <div class="modal">
+    <div class="modal-hd">
+      <h3 id="modal-title">—</h3>
+      <button class="btn btn-ghost btn-sm btn-icon" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-bd" id="modal-body"></div>
+    <div class="modal-ft" id="modal-footer"></div>
+  </div>
+</div>
+
+<div class="notif" id="notif"></div>
+<div id="print-view"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════════════════════ -->
+<!-- 1º: Lógica de licença (roda antes do app) -->
+<script src="./js/license.js"></script>
+<!-- 2º: Lógica principal do app -->
+<script src="./js/script.js" defer></script>
+
+</body>
+</html>
