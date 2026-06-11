@@ -308,21 +308,119 @@ tbody tr:last-child td { border-bottom: none; }
 /* ══ 10. PRINT — PEDIDO COMPLETO ══════════════════════ */
 #print-view { display: none; }
 @media print {
-  body * { visibility: hidden !important; }
+  /* Reset: esconde tudo exceto a área de impressão */
+  body > * { display: none !important; }
+  #print-view {
+    display: block !important; position: absolute !important;
+    top: 0; left: 0; width: 100%;
+    background: #fff !important; z-index: 9999 !important;
+    padding: 8mm 10mm !important;
+    font-family: 'Nunito', sans-serif !important; color: #000 !important;
+    font-size: 9pt !important; line-height: 1.35 !important;
+    overflow: visible !important;
+  }
   #print-view, #print-view * { visibility: visible !important; }
-  #print-view { display: block !important; position: fixed !important; inset: 0 !important; background: #fff !important; z-index: 9999 !important; padding: 12mm 14mm !important; font-family: 'Nunito', sans-serif !important; color: #000 !important; font-size: 10pt !important; }
-  /* Demais estilos de print mantidos da v3... */
-  .pr-header { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; padding-bottom: 12px; border-bottom: 2px solid #000; }
-  .pr-logo { width: 64px; height: 64px; border-radius: 50%; object-fit: cover; }
-  .pr-logo-ph { width: 64px; height: 64px; border-radius: 50%; background: #f0d8e4; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
-  .pr-co-name { font-family: 'Playfair Display', serif; font-size: 20pt; font-weight: 700; line-height: 1.2; }
-  .pr-order-num { font-size: 11pt; font-weight: 700; color: #555; margin-left: auto; text-align: right; }
-  .pr-sec-title { font-size: 8pt; font-weight: 700; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 3px; margin-bottom: 7px; color: #333; }
-  .pr-table { width: 100%; border-collapse: collapse; font-size: 9.5pt; }
-  .pr-table th { border: 1px solid #999; padding: 5px 7px; background: #f5f5f5; font-weight: 700; text-align: left; }
-  .pr-table td { border: 1px solid #ccc; padding: 5px 7px; }
-  .pr-fin { border: 2px solid #000; padding: 10px 14px; margin-top: 10px; }
-  .pr-fin-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 9.5pt; }
-  .pr-fin-row.pr-total { border-top: 1.5px solid #000; margin-top: 6px; padding-top: 8px; }
-  .pr-fin-row.pr-total .pr-fv { font-size: 20pt; font-weight: 700; font-family: 'Playfair Display', serif; }
+
+  /* ── Cabeçalho do pedido ── */
+  .pr-header {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 8px; padding-bottom: 6px;
+    border-bottom: 2px solid #000;
+  }
+  .pr-logo { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+  .pr-logo-ph {
+    width: 44px; height: 44px; border-radius: 50%; background: #f0d8e4;
+    display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0;
+  }
+  .pr-co-name { font-family: 'Playfair Display', serif; font-size: 14pt; font-weight: 700; line-height: 1.2; }
+  .pr-co-sub { font-size: 8pt; color: #555; }
+  .pr-order-num { font-size: 10pt; font-weight: 700; color: #555; margin-left: auto; text-align: right; }
+
+  /* ── Seções genéricas (espaçamento mínimo) ── */
+  .pr-section {
+    margin-bottom: 6px; padding: 4px 0;
+    page-break-inside: avoid;
+  }
+  .pr-sec-title {
+    font-size: 7.5pt; font-weight: 700; text-transform: uppercase;
+    border-bottom: 1px solid #000; padding-bottom: 2px; margin-bottom: 4px; color: #333;
+  }
+
+  /* ── Dados do cliente (grid compacto) ── */
+  .pr-info-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 2px 12px; font-size: 8.5pt;
+  }
+  .pr-info-item { padding: 1px 0; }
+  .pr-info-item span { font-weight: 700; }
+
+  /* ── Tabela de itens ── */
+  .pr-table { width: 100%; border-collapse: collapse; font-size: 8.5pt; margin-top: 2px; }
+  .pr-table th {
+    border: 1px solid #999; padding: 3px 5px;
+    background: #f5f5f5; font-weight: 700; text-align: left; font-size: 7.5pt;
+  }
+  .pr-table td { border: 1px solid #ccc; padding: 3px 5px; }
+
+  /* ── Resumo financeiro (compacto) ── */
+  .pr-fin {
+    border: 1.5px solid #000; padding: 6px 10px; margin-top: 4px;
+    page-break-inside: avoid;
+  }
+  .pr-fin-row { display: flex; justify-content: space-between; padding: 1px 0; font-size: 8.5pt; }
+  .pr-fin-row.pr-total { border-top: 1.5px solid #000; margin-top: 4px; padding-top: 4px; }
+  .pr-fin-row.pr-total .pr-fl { font-weight: 800; font-size: 9pt; }
+  .pr-fin-row.pr-total .pr-fv { font-size: 14pt; font-weight: 700; font-family: 'Playfair Display', serif; }
+
+  /* ── Entrega ── */
+  .pr-delivery-label { font-size: 7.5pt; font-weight: 700; text-transform: uppercase; color: #333; margin-bottom: 2px; }
+  .pr-delivery-box { font-size: 9pt; font-weight: 700; padding: 3px 0; }
+
+  /* ── Pagamentos ── */
+  .pr-pay-row { font-size: 8.5pt; padding: 2px 0; border-bottom: 1px solid #eee; }
+  .pr-pay-row:last-child { border-bottom: none; }
+
+  /* ── Artes do cliente (compactas) ── */
+  .pr-arts {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px;
+    page-break-inside: avoid;
+  }
+  .pr-art-img { max-width: 120px; max-height: 100px; object-fit: contain; border: 1px solid #ccc; }
+  .pr-art-label { font-size: 7pt; text-align: center; color: #555; margin-top: 2px; }
+
+  /* ── Mensagem final e rodapé ── */
+  .pr-msg {
+    text-align: center; font-size: 8.5pt; font-style: italic; color: #555;
+    margin-top: 8px; padding: 4px 0;
+    border-top: 1px dashed #ccc;
+  }
+  .pr-footer {
+    text-align: center; font-size: 7.5pt; color: #777;
+    margin-top: 4px; padding-top: 4px;
+    border-top: 1px solid #ddd;
+  }
+
+  /* ── RECIBO (modo receipt) ── */
+  #print-view.receipt-mode {
+    padding: 10mm 14mm !important;
+  }
+  .rc-wrap {
+    max-width: 360px; margin: 0 auto; font-size: 9pt;
+    border: 1.5px solid #000; padding: 12px 16px;
+  }
+  .rc-header { text-align: center; margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px dashed #999; }
+  .rc-logo { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin: 0 auto 4px; display: block; }
+  .rc-logo-ph { width: 40px; height: 40px; border-radius: 50%; background: #f0d8e4; display: flex; align-items: center; justify-content: center; font-size: 16px; margin: 0 auto 4px; }
+  .rc-company { font-family: 'Playfair Display', serif; font-size: 12pt; font-weight: 700; }
+  .rc-subtitle { font-size: 7pt; color: #555; }
+  .rc-title { text-align: center; font-size: 10pt; font-weight: 700; margin: 6px 0; letter-spacing: 1px; }
+  .rc-row { display: flex; justify-content: space-between; padding: 2px 0; font-size: 8.5pt; border-bottom: 1px dotted #ddd; }
+  .rc-label { font-weight: 700; color: #333; }
+  .rc-val { text-align: right; }
+  .rc-total-box { text-align: center; margin: 8px 0; padding: 6px; border: 1.5px solid #000; }
+  .rc-total-label { font-size: 8pt; font-weight: 700; display: block; }
+  .rc-total-value { font-size: 16pt; font-weight: 700; font-family: 'Playfair Display', serif; display: block; }
+  .rc-sign-area { display: flex; gap: 20px; margin-top: 16px; }
+  .rc-sign-line { flex: 1; border-top: 1px solid #000; padding-top: 4px; text-align: center; font-size: 7pt; color: #555; }
+  .rc-footer { text-align: center; font-size: 6.5pt; color: #999; margin-top: 8px; padding-top: 4px; border-top: 1px dashed #ccc; }
 }

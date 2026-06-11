@@ -5,16 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sistema de Pedidos</title>
 
-  <!--
-    ╔══════════════════════════════════════════════════════╗
-    ║  SISTEMA DE PEDIDOS  —  Electron Edition             ║
-    ║                                                      ║
-    ║  index.html  →  estrutura HTML (white label)         ║
-    ║  css/style.css  →  estilização                       ║
-    ║  js/license.js  →  overlay de licença (carrega 1º)  ║
-    ║  js/script.js   →  lógica do app                    ║
-    ╚══════════════════════════════════════════════════════╝
-  -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
@@ -24,7 +14,6 @@
 
   <link rel="stylesheet" href="./css/style.css" />
 
-  <!-- Estilos do overlay de licença (inlined para carregar antes do CSS do app) -->
   <style>
     /* ── Overlay de bloqueio ── */
     #license-overlay {
@@ -149,11 +138,6 @@
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════════════════════
-     OVERLAY DE LICENÇA
-     Visível até que a ativação seja confirmada.
-     Não interfere no localStorage do app — vive no processo main.
-════════════════════════════════════════════════════════════ -->
 <div id="license-overlay">
   <div class="lic-card">
     <span class="lic-icon">🔒</span>
@@ -183,9 +167,6 @@
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     APP PRINCIPAL (mesma estrutura original, white label)
-════════════════════════════════════════════════════════════ -->
 <div class="app-wrap">
 
   <header class="app-header">
@@ -220,7 +201,7 @@
       </div>
       <div class="filters-row">
         <div class="search-wrap">
-          <input type="text" id="cli-search" placeholder="Buscar nome, telefone, e-mail…" oninput="renderClients()" />
+          <input type="text" id="cli-search" placeholder="Buscar nome, CPF, telefone, e-mail…" oninput="renderClients()" />
         </div>
         <select id="cli-bday" onchange="renderClients()" style="max-width:175px">
           <option value="">🎂 Filtrar aniversário</option>
@@ -283,10 +264,7 @@
     </section>
 
   </main>
-</div><!-- /app-wrap -->
-
-<!-- Modal global -->
-<div class="modal-ov" id="modal-ov" onclick="closeModalOv(event)">
+</div><div class="modal-ov" id="modal-ov" onclick="closeModalOv(event)">
   <div class="modal">
     <div class="modal-hd">
       <h3 id="modal-title">—</h3>
@@ -300,12 +278,7 @@
 <div class="notif" id="notif"></div>
 <div id="print-view"></div>
 
-<!-- ═══════════════════════════════════════════════════════════
-     SCRIPTS
-════════════════════════════════════════════════════════════ -->
-<!-- 1º: Lógica de licença (roda antes do app) -->
 <script src="./js/license.js"></script>
-<!-- 2º: Lógica principal do app -->
 <script src="./js/script.js" defer></script>
 
 </body>
